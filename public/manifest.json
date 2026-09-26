@@ -1,0 +1,27 @@
+{
+  "id": "/",
+  "name": "CALORA - Precision Metabolic Intelligence",
+  "short_name": "CALORA",
+  "description": "Next-generation precision nutrition and metabolic tracking system with dynamic energy telemetry and offline resilience.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#0B0B0C",
+  "background_color": "#0B0B0C",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["health", "fitness", "lifestyle", "productivity"]
+}

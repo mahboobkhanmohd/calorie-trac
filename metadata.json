@@ -1,0 +1,6 @@
+{
+  "name": "CALORA - Precision Metabolic Intelligence",
+  "description": "Next-generation precision nutrition and metabolic tracking system with dynamic energy telemetry, macro architecture, and biometric intelligence.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

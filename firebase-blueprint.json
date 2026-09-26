@@ -1,0 +1,86 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with biometrics, macro targets, and preferences",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 150 },
+        "age": { "type": "number" },
+        "sex": { "type": "string", "enum": ["male", "female"] },
+        "heightCm": { "type": "number" },
+        "weightKg": { "type": "number" },
+        "activityMultiplier": { "type": "number" },
+        "goal": { "type": "string", "enum": ["lose_aggressive", "lose_moderate", "maintain", "gain_moderate", "gain_aggressive"] },
+        "calorieTarget": { "type": "number" },
+        "proteinTarget": { "type": "number" },
+        "carbsTarget": { "type": "number" },
+        "fatTarget": { "type": "number" },
+        "fiberTarget": { "type": "number" },
+        "waterTargetMl": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "calorieTarget", "proteinTarget", "carbsTarget", "fatTarget", "fiberTarget"]
+    },
+    "FoodEntry": {
+      "title": "FoodEntry",
+      "description": "Logged food entry for a user on a specific date and meal",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 30 },
+        "time": { "type": "string", "maxLength": 30 },
+        "foodId": { "type": "string", "maxLength": 128 },
+        "foodName": { "type": "string", "maxLength": 200 },
+        "meal": { "type": "string", "enum": ["breakfast", "lunch", "dinner", "snack"] },
+        "servingAmount": { "type": "number" },
+        "servingUnit": { "type": "string", "maxLength": 50 },
+        "calories": { "type": "number" },
+        "protein": { "type": "number" },
+        "carbs": { "type": "number" },
+        "fiber": { "type": "number" },
+        "fat": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "date", "foodName", "meal", "calories", "protein", "carbs", "fiber", "fat"]
+    },
+    "CustomFood": {
+      "title": "CustomFood",
+      "description": "Custom food authored by the user",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 200 },
+        "servingSize": { "type": "string", "maxLength": 100 },
+        "calories": { "type": "number" },
+        "protein": { "type": "number" },
+        "carbs": { "type": "number" },
+        "fiber": { "type": "number" },
+        "fat": { "type": "number" },
+        "category": { "type": "string", "maxLength": 50 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "name", "servingSize", "calories", "protein", "carbs", "fiber", "fat"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile document storing biometrics and caloric targets"
+    },
+    "/users/{userId}/foodEntries/{entryId}": {
+      "schema": "FoodEntry",
+      "description": "Daily food entries logged by the user"
+    },
+    "/users/{userId}/customFoods/{foodId}": {
+      "schema": "CustomFood",
+      "description": "Custom food items created by the user"
+    }
+  }
+}

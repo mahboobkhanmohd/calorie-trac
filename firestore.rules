@@ -1,0 +1,95 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation helper for UserProfile
+    function isValidUserProfile(data, userId) {
+      return data.uid == userId &&
+        data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+        data.targetCalories is number && data.targetCalories > 0 && data.targetCalories <= 15000 &&
+        data.targetProtein is number && data.targetProtein >= 0 && data.targetProtein <= 1000 &&
+        data.targetCarbs is number && data.targetCarbs >= 0 && data.targetCarbs <= 2000 &&
+        data.targetFat is number && data.targetFat >= 0 && data.targetFat <= 1000 &&
+        data.targetFiber is number && data.targetFiber >= 0 && data.targetFiber <= 500;
+    }
+
+    // Validation helper for FoodEntry
+    function isValidFoodEntry(data, userId, entryId) {
+      return data.userId == userId &&
+        data.id == entryId &&
+        data.foodName is string && data.foodName.size() > 0 && data.foodName.size() <= 200 &&
+        data.date is string && data.date.size() > 0 && data.date.size() <= 30 &&
+        data.meal in ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'breakfast', 'lunch', 'dinner', 'snack'] &&
+        data.calories is number && data.calories >= 0 && data.calories <= 10000 &&
+        data.protein is number && data.protein >= 0 && data.protein <= 1000 &&
+        data.carbs is number && data.carbs >= 0 && data.carbs <= 1000 &&
+        data.fat is number && data.fat >= 0 && data.fat <= 1000 &&
+        data.fiber is number && data.fiber >= 0 && data.fiber <= 500;
+    }
+
+    // Validation helper for CustomFood
+    function isValidCustomFood(data, userId, foodId) {
+      return data.userId == userId &&
+        data.id == foodId &&
+        data.name is string && data.name.size() > 0 && data.name.size() <= 200 &&
+        data.servingSize is string && data.servingSize.size() > 0 && data.servingSize.size() <= 100 &&
+        data.calories is number && data.calories >= 0 && data.calories <= 10000 &&
+        data.protein is number && data.protein >= 0 && data.protein <= 1000 &&
+        data.carbs is number && data.carbs >= 0 && data.carbs <= 1000 &&
+        data.fat is number && data.fat >= 0 && data.fat <= 1000 &&
+        data.fiber is number && data.fiber >= 0 && data.fiber <= 500;
+    }
+
+    // Test connection document for connection checks
+    match /test/connection {
+      allow read: if true;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming(), userId);
+      allow update: if isOwner(userId) && isValidUserProfile(incoming(), userId) && incoming().uid == existing().uid;
+      allow delete: if isOwner(userId);
+
+      match /foodEntries/{entryId} {
+        allow get: if isOwner(userId) && isValidId(entryId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(entryId) && isValidFoodEntry(incoming(), userId, entryId);
+        allow update: if isOwner(userId) && isValidId(entryId) && isValidFoodEntry(incoming(), userId, entryId) && incoming().id == existing().id && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(entryId);
+      }
+
+      match /customFoods/{foodId} {
+        allow get: if isOwner(userId) && isValidId(foodId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(foodId) && isValidCustomFood(incoming(), userId, foodId);
+        allow update: if isOwner(userId) && isValidId(foodId) && isValidCustomFood(incoming(), userId, foodId) && incoming().id == existing().id && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(foodId);
+      }
+    }
+  }
+}
